@@ -168,7 +168,7 @@ public class HttpOutput implements MessageOutput {
 
         // ensure the response (and underlying response body) is closed
         try (Response response = this.httpClient.newCall(request).execute()) {
-            if (response.code() != 200) {
+            if (response.code() > 399) {
                 LOG.info("Unexpected HTTP response status " + response.code());
                 if (this.raise_exception_on_http_error) {
                     throw new HttpOutputException("Unexpected HTTP response status " + response.code());
