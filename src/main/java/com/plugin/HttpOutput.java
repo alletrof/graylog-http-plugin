@@ -38,9 +38,11 @@ public class HttpOutput implements MessageOutput {
     private final OkHttpClient httpClient;
     private final Gson gson = new Gson();
     private boolean shutdown;
+    private boolean raise_exception_on_http_error = false;
     private String url;
     private static final String CK_OUTPUT_API = "output_api";
     private static final String CK_GZIP_REQUEST = "gzip_request";
+    private static final String CK_RAISE_EXCEPTION = "raise_exception";
     private static final Logger LOG = LoggerFactory.getLogger(HttpOutput.class);
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
@@ -90,11 +92,13 @@ public class HttpOutput implements MessageOutput {
     public HttpOutput(@Assisted Stream stream, @Assisted Configuration conf) throws HttpOutputException {
 
         this.url = conf.getString(CK_OUTPUT_API);
+        this.raise_exception_on_http_error = conf.getBoolean(CK_RAISE_EXCEPTION);
 
         this.shutdown = false;
         LOG.info(" Http Output Plugin has been configured with the following parameters:");
         LOG.info(CK_OUTPUT_API + " : " + this.url);
         LOG.info(CK_GZIP_REQUEST + " : " + conf.getBoolean(CK_GZIP_REQUEST));
+        LOG.info(CK_RAISE_EXCEPTION + " : " + this.raise_exception_on_http_error);
 
         try {
             new URL(this.url);
@@ -166,7 +170,9 @@ public class HttpOutput implements MessageOutput {
         try (Response response = this.httpClient.newCall(request).execute()) {
             if (response.code() != 200) {
                 LOG.info("Unexpected HTTP response status " + response.code());
-                throw new HttpOutputException("Unexpected HTTP response status " + response.code());
+                if (this.raise_exception_on_http_error) {
+                    throw new HttpOutputException("Unexpected HTTP response status " + response.code());
+                }
             }
         }
     }
@@ -200,6 +206,9 @@ public class HttpOutput implements MessageOutput {
 
             configurationRequest.addField(new BooleanField(CK_GZIP_REQUEST, "GZIP request", false,
                                                            "Enable GZIP compression for HTTP requests."));
+
+            configurationRequest.addField(new BooleanField(CK_RAISE_EXCEPTION, "Raise exception", false,
+                    "Raise an exception on HTTP error"));
 
             return configurationRequest;
         }
