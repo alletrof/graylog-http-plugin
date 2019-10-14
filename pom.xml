@@ -26,12 +26,16 @@
             <name>Sagar R</name>
             <email>sagarinpursue@gmail.com</email>
         </developer>
+        <developer>
+            <name>SekoiaLab</name>
+            <email>contact@sekoia.io</email>
+        </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:sagarinpursue/graylog-http-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:sagarinpursue/graylog-http-plugin.git</developerConnection>
-        <url>https://github.com/sagarinpursue/graylog-http-plugin</url>
+        <connection>scm:git:git@github.com:SekoiaLab/graylog-http-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:SekoiaLab/graylog-http-plugin.git</developerConnection>
+        <url>https://github.com/SekoiaLab/graylog-http-plugin</url>
         <tag>HEAD</tag>
     </scm>
 
