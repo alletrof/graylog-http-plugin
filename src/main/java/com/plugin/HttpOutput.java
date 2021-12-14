@@ -42,52 +42,9 @@ public class HttpOutput implements MessageOutput {
     private String intake_key;
     private static final String CK_OUTPUT_API = "output_api";
     private static final String CK_INTAKE_KEY = "intake_key";
-    private static final String CK_GZIP_REQUEST = "gzip_request";
     private static final String CK_RAISE_EXCEPTION = "raise_exception";
     private static final Logger LOG = LoggerFactory.getLogger(HttpOutput.class);
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-
-    /**
-     * This interceptor compresses the HTTP request body. Many webservers can't handle this!
-     * <p>
-     * taken from https://square.github.io/okhttp/interceptors/
-     */
-    final class GzipRequestInterceptor implements Interceptor {
-        @Override
-        public Response intercept(Interceptor.Chain chain) throws IOException {
-            Request originalRequest = chain.request();
-            if (originalRequest.body() == null || originalRequest.header("Content-Encoding") != null) {
-                return chain.proceed(originalRequest);
-            }
-
-            Request compressedRequest = originalRequest.newBuilder()
-                .header("Content-Encoding", "gzip")
-                .method(originalRequest.method(), gzip(originalRequest.body()))
-                .build();
-            return chain.proceed(compressedRequest);
-        }
-
-        private RequestBody gzip(final RequestBody body) {
-            return new RequestBody() {
-                @Override
-                public MediaType contentType() {
-                    return body.contentType();
-                }
-
-                @Override
-                public long contentLength() {
-                    return -1; // We don't know the compressed length in advance!
-                }
-
-                @Override
-                public void writeTo(BufferedSink sink) throws IOException {
-                    BufferedSink gzipSink = Okio.buffer(new GzipSink(sink));
-                    body.writeTo(gzipSink);
-                    gzipSink.close();
-                }
-            };
-        }
-    }
 
     @Inject
     public HttpOutput(@Assisted Stream stream, @Assisted Configuration conf) throws HttpOutputException {
@@ -100,7 +57,6 @@ public class HttpOutput implements MessageOutput {
         LOG.info(" Http Output Plugin has been configured with the following parameters:");
         LOG.info(CK_OUTPUT_API + " : " + this.url);
         LOG.info(CK_INTAKE_KEY + " : " + this.intake_key);
-        LOG.info(CK_GZIP_REQUEST + " : " + conf.getBoolean(CK_GZIP_REQUEST));
         LOG.info(CK_RAISE_EXCEPTION + " : " + this.raise_exception_on_http_error);
 
         try {
@@ -115,9 +71,6 @@ public class HttpOutput implements MessageOutput {
             .writeTimeout(10, TimeUnit.SECONDS)
             .readTimeout(5, TimeUnit.SECONDS);
 
-        if (conf.getBoolean(CK_GZIP_REQUEST)) {
-            clientBuilder.addInterceptor(new GzipRequestInterceptor());
-        }
         this.httpClient = clientBuilder.build();
     }
 
@@ -206,9 +159,6 @@ public class HttpOutput implements MessageOutput {
             configurationRequest.addField(
                                           new TextField(CK_INTAKE_KEY, "Intake key", "",
                                                         "The intake key to identify the events", ConfigurationField.Optional.NOT_OPTIONAL));
-
-            configurationRequest.addField(new BooleanField(CK_GZIP_REQUEST, "GZIP request", false,
-                                                           "Enable GZIP compression for HTTP requests."));
 
             configurationRequest.addField(new BooleanField(CK_RAISE_EXCEPTION, "Raise exception", false,
                     "Raise an exception on HTTP error"));
