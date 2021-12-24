@@ -98,7 +98,7 @@ public class HttpOutput implements MessageOutput {
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("intake_key", this.intake_key);
-        payload.put("json", this.gson.toJson(msg.getFields()));
+        payload.put("json", msg.getMessage());
 
         this.executeRequest(
                             RequestBody.create(
