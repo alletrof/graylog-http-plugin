@@ -14,7 +14,7 @@
 
     <groupId>com.plugin</groupId>
     <artifactId>graylog-plugin-http-output</artifactId>
-    <version>1.0.6-SNAPSHOT</version>
+    <version>1.0.5-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
@@ -30,16 +30,12 @@
             <name>SekoiaLab</name>
             <email>contact@sekoia.io</email>
         </developer>
-	<developer>
-	    <name>Maxence FOSSAT</name>
-	    <email>maxence.fossat@protonmail.com</email>
-	</developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:alletrof/graylog-http-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:alletrof/graylog-http-plugin.git</developerConnection>
-        <url>https://github.com/alletrof/graylog-http-plugin</url>
+        <connection>scm:git:git@github.com:SekoiaLab/graylog-http-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:SekoiaLab/graylog-http-plugin.git</developerConnection>
+        <url>https://github.com/SekoiaLab/graylog-http-plugin</url>
         <tag>HEAD</tag>
     </scm>
 
